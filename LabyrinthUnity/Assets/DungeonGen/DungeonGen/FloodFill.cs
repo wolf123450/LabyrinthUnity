@@ -8,13 +8,13 @@ namespace DungeonGen
 		bool[,] visited;
 		char[,] map;
 		//List<vector2i> workingSet;
-		SortedSet<vector2i> workingSet;
+		HashSet<vector2i> workingSet;
 		int count = 0;
 
 		public FloodFill ()
 		{
 			//workingSet = new List<vector2i> ();
-			workingSet = new SortedSet<vector2i> ();
+			workingSet = new HashSet<vector2i> ();
 		}
 
 		public int reachableSpaces(char[,] dungeonMap, vector2i freeSpace){
@@ -24,7 +24,9 @@ namespace DungeonGen
 			workingSet.Add (freeSpace);
 
 			do {
-				vector2i tile = workingSet.Min;
+				HashSet<vector2i>.Enumerator en = workingSet.GetEnumerator();
+				vector2i tile = en.Current;
+				en.Dispose();
 				workingSet.Remove (tile);
 				visited [tile.x, tile.y] = true;
 				count++;
