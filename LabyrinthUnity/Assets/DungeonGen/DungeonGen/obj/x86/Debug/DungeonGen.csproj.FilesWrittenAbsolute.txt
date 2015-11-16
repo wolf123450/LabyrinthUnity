@@ -1,5 +1,0 @@
-/users/guest/c/ccday91/Workspace/CS455/FinalProject/DungeonGen/DungeonGen/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
-/users/guest/c/ccday91/Workspace/CS455/FinalProject/DungeonGen/DungeonGen/bin/Debug/DungeonGen.exe.mdb
-/users/guest/c/ccday91/Workspace/CS455/FinalProject/DungeonGen/DungeonGen/bin/Debug/DungeonGen.exe
-/users/guest/c/ccday91/Workspace/CS455/FinalProject/DungeonGen/DungeonGen/obj/x86/Debug/DungeonGen.exe
-/users/guest/c/ccday91/Workspace/CS455/FinalProject/DungeonGen/DungeonGen/obj/x86/Debug/DungeonGen.exe.mdb
