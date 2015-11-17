@@ -32,8 +32,10 @@ public class WanderingGhost : MonoBehaviour {
 			turning = false;
 			target = obj.attachedRigidbody;
 
+			if(!scream.isPlaying) {
+				scream.Play ();
+			}
 			scream.loop = true;
-			scream.Play ();
 		}
 	}
 	
