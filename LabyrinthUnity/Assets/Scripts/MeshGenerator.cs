@@ -8,6 +8,8 @@ public class MeshGenerator : MonoBehaviour {
 	public MeshFilter walls;
 	public MeshFilter cave;
 	public MeshFilter floor;
+
+	private float squareWidth;
 	
 	List<Vector3> vertices;
 	List<int> triangles;
@@ -17,7 +19,7 @@ public class MeshGenerator : MonoBehaviour {
 	HashSet<int> checkedVertices = new HashSet<int>();
 	
 	public void GenerateMesh(int[,] map, float squareSize) {
-		
+		squareWidth = squareSize;
 		triangleDictionary.Clear ();
 		outlines.Clear ();
 		checkedVertices.Clear ();
@@ -55,10 +57,10 @@ public class MeshGenerator : MonoBehaviour {
 		Mesh fl = new Mesh();
 
 
-		Vector3[] flv = {new Vector3(-map.GetLength(0)/2,-5,-map.GetLength(1)/2), 
-			new Vector3(map.GetLength(0)/2,-5,-map.GetLength(1)/2), 
-			new Vector3(-map.GetLength(0)/2,-5,map.GetLength(1)/2), 
-			new Vector3(map.GetLength(0)/2,-5,map.GetLength(1)/2) };
+		Vector3[] flv = {new Vector3(-map.GetLength(0)*squareSize/2,-5*squareSize,-map.GetLength(1)*squareSize/2), 
+			new Vector3(map.GetLength(0)*squareSize/2,-5*squareSize,-map.GetLength(1)*squareSize/2), 
+			new Vector3(-map.GetLength(0)*squareSize/2,-5*squareSize,map.GetLength(1)*squareSize/2), 
+			new Vector3(map.GetLength(0)*squareSize/2,-5*squareSize,map.GetLength(1)*squareSize/2) };
 
 		int[] flt = {0,2,3, 3,1,0};
 
@@ -84,7 +86,7 @@ public class MeshGenerator : MonoBehaviour {
 		List<Vector2> wallUVs = new List<Vector2>();
 		List<int> wallTriangles = new List<int> ();
 		Mesh wallMesh = new Mesh ();
-		float wallHeight = 5;
+		float wallHeight = 5*squareWidth;
 		int squareSize = 1;
 
 

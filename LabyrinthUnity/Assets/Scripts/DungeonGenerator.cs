@@ -7,7 +7,9 @@ using System.Collections;
 
 public class DungeonGenerator :MonoBehaviour 
 {
-
+	public GameObject playerController;
+	public GameObject GhostPrefab;
+	public GameObject RobotPrefab;
 	DungeonGen dgen;
 	int[,] map;
 
@@ -19,7 +21,7 @@ public class DungeonGenerator :MonoBehaviour
 //		UnityEngine.Debug.Log (dgen.printMaze ());
 		dgen = new DungeonGen ();
 		dgen.width = 30;
-		dgen.height = 70;
+		dgen.height = 40;
 
 		dgen.Start(); // Don't touch any data in the job class after you called Start until IsDone is true.
 	}
@@ -50,7 +52,9 @@ public class DungeonGenerator :MonoBehaviour
 				MeshGenerator meshGen = GetComponent<MeshGenerator>();
 
 
-				meshGen.GenerateMesh(borderedMap, 1);
+				meshGen.GenerateMesh(borderedMap, 2);
+				Destroy(Camera.main.gameObject);
+				Instantiate(playerController, new Vector3(0,0,0), transform.rotation);
 				dgen = null;
 			}
 		}
