@@ -27,8 +27,9 @@ public class MinotaurAI : MonoBehaviour {
 		}
 	}
 
-	public void addSound (AudioSource sound, Rigidbody noiseSource) {
-		if (sound.volume > hearingLimit) {
+	public void addSound (Rigidbody noiseSource, float volume) {
+		//create an method for determining volume over distance
+		if (volume > hearingLimit) {
 			destination = noiseSource.position;
 			loudNoiseHeard = true;
 		}
