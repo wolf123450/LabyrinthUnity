@@ -7,17 +7,21 @@ public class MinotaurAI : MonoBehaviour {
 	private bool loudNoiseHeard;
 	private Vector3 destination;
 	private Vector3 layerLocation;
-	private int hearingLimit;
+	private int hearingScale;
 
 	// Use this for initialization
 	void Start () {
 		destination = new Vector3();
-		hearingLimit = 0;
+		hearingScale = 99; //If more difficult can be as low as 50
 		loudNoiseHeard = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		Vector3 position = GetComponentInParent<Transform> ().position;
+		Vector3 playerPosition = GameObject.FindGameObjectWithTag ("Player").GetComponent<Rigidbody>().position;
+
+		Debug.Log("Distance" + (playerPosition - position).magnitude); //range from 3 to 50 units
 		switch (state) {
 			case State.SLEEPING: Sleeping(); break;
 			case State.ALERT: Alert(); break;
@@ -28,8 +32,23 @@ public class MinotaurAI : MonoBehaviour {
 	}
 
 	public void addSound (Rigidbody noiseSource, float volume) {
-		//create an method for determining volume over distance
-		if (volume > hearingLimit) {
+		/*
+		Walking volume = 250
+		Running volume = 1000
+		Puddle volume (if we ever get to it) = 2250
+		Chain volume = 4000
+		Rock or bone volume = 6250
+
+		This scale is only reasonable with a minotaur hearingScale = 50 to 99 
+			where the lower the value, the more sensitive or difficult the minotaur is.
+		*/
+		//TODO: make the player walk slower... and maybe run a little slower too
+
+
+		Vector3 position = GetComponentInParent<Transform> ().position;
+		float distance = (noiseSource.position - position).magnitude;
+		int power = (int) (volume / distance);
+		if (power > hearingScale) {
 			destination = noiseSource.position;
 			loudNoiseHeard = true;
 		}
