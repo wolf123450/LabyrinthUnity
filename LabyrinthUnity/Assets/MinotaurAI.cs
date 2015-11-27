@@ -18,7 +18,7 @@ public class MinotaurAI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Vector3 position = GetComponentInParent<Transform> ().position;
+		Vector3 position = GetComponent<Transform> ().position;
 		Vector3 playerPosition = GameObject.FindGameObjectWithTag ("Player").GetComponent<Rigidbody>().position;
 
 		Debug.Log("Distance" + (playerPosition - position).magnitude); //range from 3 to 50 units
