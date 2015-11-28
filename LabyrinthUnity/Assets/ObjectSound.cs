@@ -15,10 +15,11 @@ public class ObjectSound : MonoBehaviour {
 
 	void OnTriggerEnter(Collider obj) {
 		if (obj.tag.Equals ("Player")) {
+			//Rigidbody body = 
 			GameObject[] minotaurs = GameObject.FindGameObjectsWithTag("Minotaur");
 			for(int i = 0; i < minotaurs.Length; i++)
 			{
-				minotaurs[i].GetComponent<ScriptableObject>();
+				minotaurs[i].GetComponent<MinotaurAI>().addSound(null,250);
 			}
 		}
 	}
