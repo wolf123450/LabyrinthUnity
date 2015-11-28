@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,20 +9,27 @@ using System.Collections;
 public class DungeonGenerator :MonoBehaviour 
 {
 	public GameObject playerController;
+	public GameObject MinotaurPrefab;
 	public GameObject GhostPrefab;
 	public GameObject RobotPrefab;
-	DungeonGen dgen;
-	int[,] map;
+	public GameObject StairsPrefab;
+
+
+	public DungeonGen dgen;
+	public int[,] map;
+	public int[,] borderedMap;
+	MeshGenerator meshGen;
 
 	void Start(){
-		UnityEngine.Debug.Log ("Hello World!");
 //		
 //		DungeonGen dgen = new DungeonGen ();
 //		dgen.braidMaze (30,70);
 //		UnityEngine.Debug.Log (dgen.printMaze ());
 		dgen = new DungeonGen ();
-		dgen.width = 30;
-		dgen.height = 40;
+		if (DungeonGen.width == 0){
+			DungeonGen.width = 5;
+			DungeonGen.height = 10;
+		}
 
 		dgen.Start(); // Don't touch any data in the job class after you called Start until IsDone is true.
 	}
@@ -35,11 +43,11 @@ public class DungeonGenerator :MonoBehaviour
 				// Alternative to the OnFinished callback
 				map = dgen.newDungeon;
 				int borderSize = 2;
-				int[,] borderedMap = new int[dgen.width + borderSize * 2,dgen.height + borderSize * 2];
+				borderedMap = new int[DungeonGen.width + borderSize * 2,DungeonGen.height + borderSize * 2];
 
 				for (int x = 0; x < borderedMap.GetLength(0); x ++) {
 					for (int y = 0; y < borderedMap.GetLength(1); y ++) {
-						if (x >= borderSize && x < dgen.width + borderSize && y >= borderSize && y < dgen.height + borderSize) {
+						if (x >= borderSize && x < DungeonGen.width + borderSize && y >= borderSize && y < DungeonGen.height + borderSize) {
 							borderedMap[x,y] = map[x-borderSize,y-borderSize];
 						}
 						else {
@@ -49,20 +57,44 @@ public class DungeonGenerator :MonoBehaviour
 				}
 
 
-				MeshGenerator meshGen = GetComponent<MeshGenerator>();
+				meshGen = GetComponent<MeshGenerator>();
 
+				Vector3 start = new Vector3(0,-10,0);
+				Vector3 end = new Vector3(0,-10,1);
+				bool startPlaced = false;
+				bool endPlaced = false;
+				for (int x = 0; x < borderedMap.GetLength(0); x++){
+					for (int y = 0; y < borderedMap.GetLength(1); y++){
+						if ( borderedMap[x,y] == DungeonGen.space && dgen.rand.Next(0,100) > 50 && !startPlaced){
 
-				meshGen.GenerateMesh(borderedMap, 2);
+							start = new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-10,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth);
+							UnityEngine.Debug.Log((x-(borderedMap.GetLength(0)/2))*meshGen.squareWidth);
+							startPlaced = true;
+						} else if ( borderedMap[x,y] == DungeonGen.space && dgen.rand.Next(0,100) > 50 && startPlaced){
+							
+							end = new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-10,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth);
+
+							endPlaced = true;
+							break;
+						}
+					}
+					if (endPlaced)
+						break;
+				}
+				UnityEngine.Debug.Log(start);
+				meshGen.GenerateMesh(borderedMap);
 				Destroy(Camera.main.gameObject);
-				Instantiate(playerController, new Vector3(0,0,0), transform.rotation);
+
+				Instantiate(playerController, start, transform.rotation);
+				Instantiate(StairsPrefab, end, transform.rotation);
 				dgen = null;
 			}
 		}
 
 	}
 
-//	void OnDrawGizmos(){
-//		if (map != null){
+	void OnDrawGizmos(){
+		if (map != null){
 //			for (int x = 0; x < map.GetLength(0); x++){
 //				for (int y = 0; y < map.GetLength(1); y++){
 //					if (map[x,y] == DungeonGen.wall){
@@ -70,8 +102,16 @@ public class DungeonGenerator :MonoBehaviour
 //					}
 //				}
 //			}
-//		}
-//	}
+			for (int x = 0; x < borderedMap.GetLength(0); x++){
+				for (int y = 0; y < borderedMap.GetLength(1); y++){
+					if ( borderedMap[x,y] == DungeonGen.space ){
+						Gizmos.DrawCube(new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-10,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth), new Vector3(.5f,.5f,.5f));
+					}
+				}
+			}
+
+		}
+	}
 	
 	public class ThreadedJob //No more blocking!
 	{
@@ -135,7 +175,7 @@ public class DungeonGenerator :MonoBehaviour
 		}
 	}
 	
-	class DungeonGen : ThreadedJob{
+	public class DungeonGen : ThreadedJob{
 		int RAND_RANGE = 100;
 		//#The probability variation for creating new wall seeds.
 		
@@ -148,15 +188,15 @@ public class DungeonGenerator :MonoBehaviour
 		//#How long to let an algorithm run, in milliseconds.
 		int DEAD_END = 2;
 
-		public int width;
-		public int height;
+		public static int width;
+		public static int height;
 
 
 		public static int wall = 1;
 		public static int space = 0;
 
 		public int[,] newDungeon;
-		System.Random rand;
+		public System.Random rand;
 
 		public DungeonGen ()
 		{
@@ -234,7 +274,7 @@ public class DungeonGenerator :MonoBehaviour
 			FloodFill f = new FloodFill ();
 			vector2i start = null;
 			for (int x = 0; x < newDungeon.GetLength(0); x++){
-				for (int y = 0; y < newDungeon.GetLength(0); y++){
+				for (int y = 0; y < newDungeon.GetLength(1); y++){
 					if ( newDungeon[x,y] == space){
 						start = new vector2i (x, y);
 						break;

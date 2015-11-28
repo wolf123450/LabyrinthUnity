@@ -9,7 +9,7 @@ public class MeshGenerator : MonoBehaviour {
 	public MeshFilter cave;
 	public MeshFilter floor;
 
-	private float squareWidth;
+	public float squareWidth;
 	
 	List<Vector3> vertices;
 	List<int> triangles;
@@ -18,13 +18,13 @@ public class MeshGenerator : MonoBehaviour {
 	List<List<int>> outlines = new List<List<int>> ();
 	HashSet<int> checkedVertices = new HashSet<int>();
 	
-	public void GenerateMesh(int[,] map, float squareSize) {
-		squareWidth = squareSize;
+	public void GenerateMesh(int[,] map) {
+//		squareWidth = squareSize;
 		triangleDictionary.Clear ();
 		outlines.Clear ();
 		checkedVertices.Clear ();
 		
-		squareGrid = new SquareGrid(map, squareSize);
+		squareGrid = new SquareGrid(map, squareWidth);
 		
 		vertices = new List<Vector3>();
 		triangles = new List<int>();
@@ -45,8 +45,8 @@ public class MeshGenerator : MonoBehaviour {
 		int tileAmount = 15;
 		Vector2[] uvs = new Vector2[vertices.Count];
 		for (int i =0; i < vertices.Count; i ++) {
-			float percentX = Mathf.InverseLerp(-map.GetLength(0)/2*squareSize,map.GetLength(0)/2*squareSize,vertices[i].x) * tileAmount;
-			float percentY = Mathf.InverseLerp(-map.GetLength(1)/2*squareSize,map.GetLength(1)/2*squareSize,vertices[i].z) * tileAmount;
+			float percentX = Mathf.InverseLerp(-map.GetLength(0)/2*squareWidth,map.GetLength(0)/2*squareWidth,vertices[i].x) * tileAmount;
+			float percentY = Mathf.InverseLerp(-map.GetLength(1)/2*squareWidth,map.GetLength(1)/2*squareWidth,vertices[i].z) * tileAmount;
 			uvs[i] = new Vector2(percentX,percentY);
 		}
 		mesh.uv = uvs;
@@ -56,11 +56,10 @@ public class MeshGenerator : MonoBehaviour {
 
 		Mesh fl = new Mesh();
 
-
-		Vector3[] flv = {new Vector3(-map.GetLength(0)*squareSize/2,-5*squareSize,-map.GetLength(1)*squareSize/2), 
-			new Vector3(map.GetLength(0)*squareSize/2,-5*squareSize,-map.GetLength(1)*squareSize/2), 
-			new Vector3(-map.GetLength(0)*squareSize/2,-5*squareSize,map.GetLength(1)*squareSize/2), 
-			new Vector3(map.GetLength(0)*squareSize/2,-5*squareSize,map.GetLength(1)*squareSize/2) };
+		Vector3[] flv = {new Vector3(-map.GetLength(0)*squareWidth/2,-5*squareWidth,-map.GetLength(1)*squareWidth/2), 
+			new Vector3(map.GetLength(0)*squareWidth/2,-5*squareWidth,-map.GetLength(1)*squareWidth/2), 
+			new Vector3(-map.GetLength(0)*squareWidth/2,-5*squareWidth,map.GetLength(1)*squareWidth/2), 
+			new Vector3(map.GetLength(0)*squareWidth/2,-5*squareWidth,map.GetLength(1)*squareWidth/2) };
 
 		int[] flt = {0,2,3, 3,1,0};
 
