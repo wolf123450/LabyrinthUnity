@@ -27,7 +27,7 @@ public class WanderingGhost : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter(Collider obj) {
-		if (obj.name.Equals ("Player")) {
+		if (obj.tag.Equals ("Player")) {
 			alert = true;
 			turning = false;
 			target = obj.attachedRigidbody;
