@@ -31,39 +31,46 @@ public class MinotaurAI : MonoBehaviour {
 		}
 	}
 	
-	public void addSound (Transform noiseSource, float volume) {
-		/*
-		Walking volume = 250
-		Running volume = 1000
-		Puddle volume (if we ever get to it) = 2250
-		Chain volume = 4000
-		Rock or bone volume = 6250
-
-		This scale is only reasonable with a minotaur hearingScale = 50 to 99 
-			where the lower the value, the more sensitive or difficult the minotaur is.
-		*/
+	public void addSound (Transform noiseSource, string tag) {
+		int volume = 10;
+		switch (tag) {
+		case "NoiseVolume1": volume = 250; break;
+		case "NoiseVolume2": volume = 1000; break;
+		case "NoiseVolume3": volume = 2250; break;
+		case "NoiseVolume4": volume = 4000; break;
+		case "NoiseVolume5": volume = 6250; break;
+			/*
+				This scale is only reasonable with a Minotaur hearingScale of 50 to 99 
+					where the lower the value, the more sensitive or difficult the minotaur is.
+			*/
+		}
+		
+		
 		//TODO: make the player walk slower... and maybe run a little slower too
 		
-		Debug.Log ("Method addSound() called");
 		Vector3 position = GetComponentInParent<Transform> ().position;
 		float distance = (noiseSource.position - position).magnitude;
 		int power = (int) (volume / distance);
 		if (power > hearingScale) {
 			destination = noiseSource.position;
-			Debug.Log("Noise heard");
 			loudNoiseHeard = true;
 		}
 	}
 	
 	void Sleeping () {
+		AudioSource snore = GetComponent<AudioSource>();
+		if (!snore.isPlaying) {
+			snore.time = 0;
+			snore.Play();
+		}
 		if (loudNoiseHeard) {
-			//stop snore loop
 			state = State.ALERT;
+
+			snore.Stop();
 		}
 	}
 	
 	void Alert () {
-		Debug.Log("I heard you: " + destination.ToString());
 		//move slowly toward destination
 		
 		//if (player found) { state = State.CHARGING; }
