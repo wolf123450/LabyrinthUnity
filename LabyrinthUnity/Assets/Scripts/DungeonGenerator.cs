@@ -13,6 +13,7 @@ public class DungeonGenerator :MonoBehaviour
 	public GameObject GhostPrefab;
 	public GameObject RobotPrefab;
 	public GameObject StairsPrefab;
+	public GameObject WallPrefab;
 
 
 	public DungeonGen dgen;
@@ -70,23 +71,27 @@ public class DungeonGenerator :MonoBehaviour
 							start = new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-10,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth);
 							UnityEngine.Debug.Log((x-(borderedMap.GetLength(0)/2))*meshGen.squareWidth);
 							startPlaced = true;
-						} else if ( borderedMap[x,y] == DungeonGen.space && dgen.rand.Next(0,100) > 50 && startPlaced){
+						} else if ( borderedMap[x,y] == DungeonGen.space && dgen.rand.Next(0,100) > 50 && startPlaced && !endPlaced){
 							
-							end = new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-10,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth);
+							end = new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-11,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth);
 
 							endPlaced = true;
-							break;
+//							break;
+						} else if (borderedMap[x,y] == DungeonGen.wall){
+							Instantiate(WallPrefab, new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-8,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth), transform.rotation);
 						}
 					}
-					if (endPlaced)
-						break;
+//					if (endPlaced)
+//						break;
 				}
 				UnityEngine.Debug.Log(start);
-				meshGen.GenerateMesh(borderedMap);
+//				meshGen.GenerateMesh(borderedMap);
+
 				Destroy(Camera.main.gameObject);
 
 				Instantiate(playerController, start, transform.rotation);
-				Instantiate(StairsPrefab, end, transform.rotation);
+
+				Instantiate(StairsPrefab, end, StairsPrefab.transform.rotation);
 				dgen = null;
 			}
 		}
