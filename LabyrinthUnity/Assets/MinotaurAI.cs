@@ -31,22 +31,23 @@ public class MinotaurAI : MonoBehaviour {
 		}
 	}
 	
-	public void addSound (Transform noiseSource, string tag) {
+	public void addSound (Transform noiseSource, int level) {
 		int volume = 10;
-		switch (tag) {
-			case "NoiseVolume1": volume = 250; break;
-			case "NoiseVolume2": volume = 1000; break;
-			case "NoiseVolume3": volume = 2250; break;
-			case "NoiseVolume4": volume = 4000; break;
-			case "NoiseVolume5": volume = 6250; break;
-			/*
-				This scale is only reasonable with a Minotaur hearingScale of 50 to 99 
-					where the lower the value, the more sensitive or difficult the minotaur is.
-			*/
+		if (level == 1) {
+			volume = 250;
+		} else if (level == 2) {
+			volume = 1000;
+		} else if (level == 3) {
+			volume = 2250;
+		} else if (level == 4) {
+			volume = 4000;
+		} else if (level == 5) {
+			volume = 6250;
 		}
-		
-		
-		//TODO: make the player walk slower... and maybe run a little slower too
+		/*
+			This scale is only reasonable with a Minotaur hearingScale of 50 to 99 
+				where the lower the value, the more sensitive to noise the minotaur is.
+		*/
 		
 		Vector3 position = GetComponentInParent<Transform> ().position;
 		float distance = (noiseSource.position - position).magnitude;
@@ -58,7 +59,6 @@ public class MinotaurAI : MonoBehaviour {
 	}
 	
 	void Sleeping () {
-		Debug.Log ("Sleeping");
 		AudioSource snore = GetComponent<AudioSource>();
 		if (!snore.isPlaying) {
 			snore.time = 0;
@@ -72,7 +72,6 @@ public class MinotaurAI : MonoBehaviour {
 	}
 	
 	void Alert () {
-		Debug.Log ("Alert");
 		//move slowly toward destination
 		
 		//if (player found) { state = State.CHARGING; }
