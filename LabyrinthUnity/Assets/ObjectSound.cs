@@ -16,7 +16,7 @@ public class ObjectSound : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider obj) {
 		if (obj.tag.Equals ("Player")) {
-			Transform location = GetComponentInParent<Transform>();
+			Vector3 location = GetComponentInParent<Transform>().position;
 			GameObject[] minotaurs = GameObject.FindGameObjectsWithTag("Minotaur");
 			for(int i = 0; i < minotaurs.Length; i++)
 			{
