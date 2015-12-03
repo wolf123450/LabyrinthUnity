@@ -11,9 +11,9 @@ public class MinotaurAI : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		destination = new Vector3();
-		hearingScale = 0;//99; //If more difficult can be as low as 50
+		hearingScale = 99; //If more difficult can be as low as 50
 		loudNoiseHeard = false;
+		state = State.SLEEPING;
 	}
 	
 	// Update is called once per frame
@@ -23,22 +23,22 @@ public class MinotaurAI : MonoBehaviour {
 		
 		//Debug.Log("Distance" + (playerPosition - position).magnitude); //range from 3 to 50 units
 		switch (state) {
-		case State.SLEEPING: Sleeping(); break;
-		case State.ALERT: Alert(); break;
-		case State.WANDERING: Wandering(); break;
-		case State.CHARGING: Charging(); break;
-		case State.RETURNING: Returning(); break;
+			case State.SLEEPING: Sleeping(); break;
+			case State.ALERT: Alert(); break;
+			case State.WANDERING: Wandering(); break;
+			case State.CHARGING: Charging(); break;
+			case State.RETURNING: Returning(); break;
 		}
 	}
 	
 	public void addSound (Transform noiseSource, string tag) {
 		int volume = 10;
 		switch (tag) {
-		case "NoiseVolume1": volume = 250; break;
-		case "NoiseVolume2": volume = 1000; break;
-		case "NoiseVolume3": volume = 2250; break;
-		case "NoiseVolume4": volume = 4000; break;
-		case "NoiseVolume5": volume = 6250; break;
+			case "NoiseVolume1": volume = 250; break;
+			case "NoiseVolume2": volume = 1000; break;
+			case "NoiseVolume3": volume = 2250; break;
+			case "NoiseVolume4": volume = 4000; break;
+			case "NoiseVolume5": volume = 6250; break;
 			/*
 				This scale is only reasonable with a Minotaur hearingScale of 50 to 99 
 					where the lower the value, the more sensitive or difficult the minotaur is.
@@ -58,6 +58,7 @@ public class MinotaurAI : MonoBehaviour {
 	}
 	
 	void Sleeping () {
+		Debug.Log ("Sleeping");
 		AudioSource snore = GetComponent<AudioSource>();
 		if (!snore.isPlaying) {
 			snore.time = 0;
@@ -71,6 +72,7 @@ public class MinotaurAI : MonoBehaviour {
 	}
 	
 	void Alert () {
+		Debug.Log ("Alert");
 		//move slowly toward destination
 		
 		//if (player found) { state = State.CHARGING; }
