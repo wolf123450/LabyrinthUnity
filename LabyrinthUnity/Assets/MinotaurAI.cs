@@ -8,15 +8,27 @@ public class MinotaurAI : MonoBehaviour {
 	private Vector3 destination;
 	private Vector3 layerLocation;
 	private int hearingScale;
-	
-	// Use this for initialization
+	private float angularSpeed_fast;
+	private float speed_fast;
+	private float angularSpeed_slow;
+	private float speed_slow;
+	private bool playerSighted;
+
+
 	void Start () {
-		hearingScale = 99; //If more difficult can be as low as 50
+		layerLocation = GetComponent<Transform> ().position;
+		hearingScale = 0;//99; //If more difficult can be as low as 50
 		loudNoiseHeard = false;
+
+		angularSpeed_fast = 120f;
+		speed_fast = 3.5f;
+		angularSpeed_slow = 120f;
+		speed_slow = 3.5f;
+
 		state = State.SLEEPING;
+		playerSighted = false;
 	}
-	
-	// Update is called once per frame
+
 	void Update () {
 		Vector3 position = GetComponent<Transform> ().position;
 		Vector3 playerPosition = GameObject.FindGameObjectWithTag ("Player").GetComponent<Rigidbody>().position;
@@ -31,7 +43,7 @@ public class MinotaurAI : MonoBehaviour {
 		}
 	}
 	
-	public void addSound (Transform noiseSource, int level) {
+	public void addSound (Vector3 noisePosition, int level) {
 		int volume = 10;
 		if (level == 1) {
 			volume = 250;
@@ -50,10 +62,10 @@ public class MinotaurAI : MonoBehaviour {
 		*/
 		
 		Vector3 position = GetComponentInParent<Transform> ().position;
-		float distance = (noiseSource.position - position).magnitude;
+		float distance = (noisePosition - position).magnitude;
 		int power = (int) (volume / distance);
 		if (power > hearingScale) {
-			destination = noiseSource.position;
+			destination = noisePosition;
 			loudNoiseHeard = true;
 		}
 	}
@@ -72,10 +84,20 @@ public class MinotaurAI : MonoBehaviour {
 	}
 	
 	void Alert () {
-		//move slowly toward destination
-		
-		//if (player found) { state = State.CHARGING; }
-		//else if (at position && player not found) { state = State.WANDERING; }
+		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
+
+		if (agent.destination != destination) {
+			agent.angularSpeed = angularSpeed_slow;
+			agent.speed = speed_slow;
+			agent.destination = destination;
+		}
+
+		if (playerSighted) { 
+			state = State.CHARGING; 
+		}
+		else if (GetComponent<Transform>().position == agent.destination) { 
+			state = State.WANDERING; 
+		}
 	}
 	
 	void Wandering () {
@@ -86,13 +108,36 @@ public class MinotaurAI : MonoBehaviour {
 	}
 	
 	void Charging () {
-		//move quickly toward the player
+		if (!playerSighted) { 
+			state = State.WANDERING;
+		} else {
+			NavMeshAgent agent = GetComponent<NavMeshAgent> ();
+			GameObject player = GameObject.FindGameObjectWithTag("Player");
+			Vector3 playerLocation = player.GetComponent<Transform>().position;
+
+			if (agent.destination != playerLocation) {
+				agent.angularSpeed = angularSpeed_fast;
+				agent.speed = speed_fast;
+				agent.destination = playerLocation;
+			}
+			playerSighted = false;
+		}
 	}
 	
 	void Returning () {
-		//go back to layer
+		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
+
+		if (agent.destination != layerLocation) {
+			agent.angularSpeed = angularSpeed_slow;
+			agent.speed = speed_slow;
+			agent.destination = layerLocation;
+		}
 		
-		//if (player found) { state = State.CHARGING; }
-		//else if (position = layer && player not found) { state = State.SLEEPING; loudNoiseHeard = false; start snore loop }
+		if (playerSighted) { 
+			state = State.CHARGING; 
+		} else if (GetComponent<Transform> ().position == layerLocation) { 
+			state = State.SLEEPING; 
+			loudNoiseHeard = false; 
+		}
 	}
 }
