@@ -2,7 +2,8 @@
 using System.Collections;
 
 public class ObjectSound : MonoBehaviour {
-	
+	public int volumeLevel;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -19,8 +20,11 @@ public class ObjectSound : MonoBehaviour {
 			GameObject[] minotaurs = GameObject.FindGameObjectsWithTag("Minotaur");
 			for(int i = 0; i < minotaurs.Length; i++)
 			{
-				minotaurs[i].GetComponent<MinotaurAI>().addSound(location,tag);
+				minotaurs[i].GetComponent<MinotaurAI>().addSound(location, volumeLevel);
 			}
+
+			AudioSource sound = GetComponentInParent<AudioSource>();
+			sound.Play();
 		}
 	}
 }
