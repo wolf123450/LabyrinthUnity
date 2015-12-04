@@ -1,39 +1,39 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class MinotaurAI : MonoBehaviour {
 	private enum State { SLEEPING, ALERT, WANDERING, CHARGING, RETURNING }
 	private State state;
 	private bool loudNoiseHeard;
 	private Vector3 destination;
-	private Vector3 layerLocation;
+	private Vector3 lairLocation;
 	private int hearingScale;
 	private float angularSpeed_fast;
 	private float speed_fast;
 	private float angularSpeed_slow;
 	private float speed_slow;
 	private bool playerSighted;
+	private bool firstTime;
+	private int waitCount;
 
 
 	void Start () {
-		layerLocation = GetComponent<Transform> ().position;
+		lairLocation = GetComponent<Transform> ().position;
 		hearingScale = 0;//99; //If more difficult can be as low as 50
 		loudNoiseHeard = false;
+		firstTime = true;
 
 		angularSpeed_fast = 120f;
-		speed_fast = 3.5f;
-		angularSpeed_slow = 120f;
-		speed_slow = 3.5f;
+		speed_fast = 4f;
+		angularSpeed_slow = 80f;
+		speed_slow = 2f;
 
 		state = State.SLEEPING;
 		playerSighted = false;
 	}
 
 	void Update () {
-		Vector3 position = GetComponent<Transform> ().position;
-		Vector3 playerPosition = GameObject.FindGameObjectWithTag ("Player").GetComponent<Rigidbody>().position;
-		
-		//Debug.Log("Distance" + (playerPosition - position).magnitude); //range from 3 to 50 units
 		switch (state) {
 			case State.SLEEPING: Sleeping(); break;
 			case State.ALERT: Alert(); break;
@@ -60,7 +60,7 @@ public class MinotaurAI : MonoBehaviour {
 			This scale is only reasonable with a Minotaur hearingScale of 50 to 99 
 				where the lower the value, the more sensitive to noise the minotaur is.
 		*/
-		
+		Debug.Log ("AddSound");
 		Vector3 position = GetComponentInParent<Transform> ().position;
 		float distance = (noisePosition - position).magnitude;
 		int power = (int) (volume / distance);
@@ -75,10 +75,11 @@ public class MinotaurAI : MonoBehaviour {
 		if (!snore.isPlaying) {
 			snore.time = 0;
 			snore.Play();
+			Debug.Log ("Sleeping");
 		}
 		if (loudNoiseHeard) {
 			state = State.ALERT;
-
+			firstTime = true;
 			snore.Stop();
 		}
 	}
@@ -86,17 +87,31 @@ public class MinotaurAI : MonoBehaviour {
 	void Alert () {
 		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
 
-		if (agent.destination != destination) {
+		if (!agent.destination.Equals (destination)) {
 			agent.angularSpeed = angularSpeed_slow;
 			agent.speed = speed_slow;
 			agent.destination = destination;
+			Debug.Log ("Alert");
 		}
 
+		//Debug.Log (GetComponent<Transform>().position.ToString() + " : " + destination.ToString() );
 		if (playerSighted) { 
 			state = State.CHARGING; 
 		}
-		else if (GetComponent<Transform>().position == agent.destination) { 
-			state = State.WANDERING; 
+		else if (isClose(GetComponent<Transform>().position, destination)) {  
+			if(firstTime) {
+				waitCount = 500;
+				firstTime = false;
+			}
+			else if(waitCount > 0){
+				waitCount--;
+			}
+			else
+			{
+				state = State.RETURNING;
+				firstTime = true;
+				destination = lairLocation;
+			}
 		}
 	}
 	
@@ -115,10 +130,11 @@ public class MinotaurAI : MonoBehaviour {
 			GameObject player = GameObject.FindGameObjectWithTag("Player");
 			Vector3 playerLocation = player.GetComponent<Transform>().position;
 
-			if (agent.destination != playerLocation) {
+			if (!agent.destination.Equals (playerLocation)) {
 				agent.angularSpeed = angularSpeed_fast;
 				agent.speed = speed_fast;
 				agent.destination = playerLocation;
+				Debug.Log ("Charging");
 			}
 			playerSighted = false;
 		}
@@ -127,17 +143,40 @@ public class MinotaurAI : MonoBehaviour {
 	void Returning () {
 		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
 
-		if (agent.destination != layerLocation) {
+		if (firstTime) {
 			agent.angularSpeed = angularSpeed_slow;
 			agent.speed = speed_slow;
-			agent.destination = layerLocation;
+			agent.destination = lairLocation;
+			firstTime = false;
+		} else if (!destination.Equals (lairLocation)) {
+			state = State.ALERT;
+			firstTime = true;
 		}
-		
+
+
 		if (playerSighted) { 
 			state = State.CHARGING; 
-		} else if (GetComponent<Transform> ().position == layerLocation) { 
-			state = State.SLEEPING; 
+		} else if (isClose(GetComponent<Transform> ().position,lairLocation)) {
+			Debug.Log("Go to sleep....");
+			state = State.SLEEPING;
 			loudNoiseHeard = false; 
 		}
+	}
+
+
+
+
+	public bool isClose(Vector3 first, Vector3 second)
+	{
+		if (Math.Abs(first.x - second.x) <= 1) 
+		{
+			if(Math.Abs(first.z - second.z) <=1)
+			{
+				return true;
+			}
+		}
+		return false;
+
+
 	}
 }
