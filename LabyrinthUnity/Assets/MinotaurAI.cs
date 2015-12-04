@@ -166,7 +166,7 @@ public class MinotaurAI : MonoBehaviour {
 
 
 
-	public bool isClose(Vector3 first, Vector3 second)
+    bool isClose(Vector3 first, Vector3 second)
 	{
 		if (Math.Abs(first.x - second.x) <= 1) 
 		{
