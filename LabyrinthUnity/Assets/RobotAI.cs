@@ -14,7 +14,7 @@ public class RobotAI : MonoBehaviour {
 	private int waitCount;
 	private bool firstTime;
 	private AudioSource movingSound;
-	
+
 	
 	void Start () {
 		
@@ -144,6 +144,7 @@ public class RobotAI : MonoBehaviour {
 
 
 	}
+
 
 	
 	bool isClose(Vector3 first, Vector3 second)
