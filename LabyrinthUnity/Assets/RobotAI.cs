@@ -12,17 +12,19 @@ public class RobotAI : MonoBehaviour {
 	private float speed_slow;
 	private bool playerSighted;
 	private int waitCount;
+	private bool firstTime;
 	
 	
 	void Start () {
 		
 		angularSpeed_fast = 120f;
-		speed_fast = 4f;
-		angularSpeed_slow = 80f;
-		speed_slow = 2f;
+		speed_fast = 6f;
+		angularSpeed_slow = 100f;
+		speed_slow = 3f;
 		
 		state = State.SLEEPING;
 		playerSighted = false;
+		firstTime = true;
 	}
 	
 	void Update () {
@@ -34,13 +36,30 @@ public class RobotAI : MonoBehaviour {
 		}
 	}
 
+
 	
 	void Sleeping () {
+
 
 	}
 	
 	void Alert () {
-		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
+		NavMeshAgent agent = GetComponentInParent<NavMeshAgent> ();
+		state = State.ALERT;
+		if (!agent.destination.Equals (destination)) {
+			agent.angularSpeed = angularSpeed_slow;
+			agent.speed = speed_slow;
+			agent.SetDestination (destination);
+			Debug.Log ("Alert");
+		} 
+		if (isClose (GetComponentInParent<Transform> ().position, destination)) {
+			state = State.IDLE;
+		}
+
+		if (playerSighted) {
+			state = State.CHARGING;
+			Debug.Log("GOING TO CHARGE!");
+		}
 		
 
 	}
@@ -53,9 +72,11 @@ public class RobotAI : MonoBehaviour {
 	}
 	
 	void Charging () {
+		Debug.Log("CHARGING!");
 		if (!playerSighted) { 
+
 		} else {
-			NavMeshAgent agent = GetComponent<NavMeshAgent> ();
+			NavMeshAgent agent = GetComponentInParent<NavMeshAgent> ();
 			GameObject player = GameObject.FindGameObjectWithTag("Player");
 			Vector3 playerLocation = player.GetComponent<Transform>().position;
 			
@@ -70,13 +91,37 @@ public class RobotAI : MonoBehaviour {
 	}
 	
 	void Idle () {
-		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
+		NavMeshAgent agent = GetComponentInParent<NavMeshAgent> ();
+		Debug.Log ("IDLE");
+		if(firstTime) {
+			waitCount = 500;
+			firstTime = false;
+		}
+		else if(waitCount > 0){
+			waitCount--;
+		}
+		else
+		{
+			state = State.SLEEPING;
+			firstTime = true;
+			
+		}
+			
 
+
+		if (playerSighted) {
+			state = State.CHARGING;
+			Debug.Log("GOING TO CHARGE!");
+		}
 	}
 	
 	public void Notify(Vector3 location)
 	{
 		Debug.Log ("ROBOT NOTIFIED!");
+		destination = location;
+		state = State.ALERT;
+
+
 	}
 
 	
