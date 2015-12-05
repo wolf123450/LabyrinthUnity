@@ -13,6 +13,7 @@ public class RobotAI : MonoBehaviour {
 	private bool playerSighted;
 	private int waitCount;
 	private bool firstTime;
+	private AudioSource movingSound;
 	
 	
 	void Start () {
@@ -25,6 +26,10 @@ public class RobotAI : MonoBehaviour {
 		state = State.SLEEPING;
 		playerSighted = false;
 		firstTime = true;
+		movingSound = GetComponentInParent<AudioSource> ();
+		if (movingSound.isPlaying) {
+			movingSound.Stop();
+		}
 	}
 	
 	void Update () {
@@ -39,6 +44,10 @@ public class RobotAI : MonoBehaviour {
 
 	
 	void Sleeping () {
+		//Debug.Log ("ROBOT SLEEPING");
+		if (movingSound.isPlaying) {
+			movingSound.Stop();
+		}
 
 
 	}
@@ -46,11 +55,15 @@ public class RobotAI : MonoBehaviour {
 	void Alert () {
 		NavMeshAgent agent = GetComponentInParent<NavMeshAgent> ();
 		state = State.ALERT;
+		if (!movingSound.isPlaying) {
+			movingSound.Play();
+		}
+
 		if (!agent.destination.Equals (destination)) {
 			agent.angularSpeed = angularSpeed_slow;
 			agent.speed = speed_slow;
 			agent.SetDestination (destination);
-			Debug.Log ("Alert");
+			//Debug.Log (" ROBOT Alert");
 		} 
 		if (isClose (GetComponentInParent<Transform> ().position, destination)) {
 			state = State.IDLE;
@@ -58,7 +71,7 @@ public class RobotAI : MonoBehaviour {
 
 		if (playerSighted) {
 			state = State.CHARGING;
-			Debug.Log("GOING TO CHARGE!");
+			Debug.Log("ROBOT GOING TO CHARGE!");
 		}
 		
 
@@ -72,7 +85,11 @@ public class RobotAI : MonoBehaviour {
 	}
 	
 	void Charging () {
-		Debug.Log("CHARGING!");
+		Debug.Log("ROBOT CHARGING!");
+		if (!movingSound.isPlaying) {
+			movingSound.Play();
+		}
+
 		if (!playerSighted) { 
 
 		} else {
@@ -84,7 +101,7 @@ public class RobotAI : MonoBehaviour {
 				agent.angularSpeed = angularSpeed_fast;
 				agent.speed = speed_fast;
 				agent.destination = playerLocation;
-				Debug.Log ("Charging");
+				Debug.Log ("ROBOT Charging");
 			}
 			playerSighted = false;
 		}
@@ -92,7 +109,11 @@ public class RobotAI : MonoBehaviour {
 	
 	void Idle () {
 		NavMeshAgent agent = GetComponentInParent<NavMeshAgent> ();
-		Debug.Log ("IDLE");
+		if (!movingSound.isPlaying) {
+			movingSound.Play();
+		}
+
+		//Debug.Log ("ROBOT IDLE");
 		if(firstTime) {
 			waitCount = 500;
 			firstTime = false;
@@ -111,13 +132,13 @@ public class RobotAI : MonoBehaviour {
 
 		if (playerSighted) {
 			state = State.CHARGING;
-			Debug.Log("GOING TO CHARGE!");
+			Debug.Log("ROBOT GOING TO CHARGE!");
 		}
 	}
 	
 	public void Notify(Vector3 location)
 	{
-		Debug.Log ("ROBOT NOTIFIED!");
+		//Debug.Log ("ROBOT NOTIFIED!");
 		destination = location;
 		state = State.ALERT;
 
@@ -127,9 +148,9 @@ public class RobotAI : MonoBehaviour {
 	
 	bool isClose(Vector3 first, Vector3 second)
 	{
-		if (Math.Abs(first.x - second.x) <= 1) 
+		if (Math.Abs(first.x - second.x) <= 5) 
 		{
-			if(Math.Abs(first.z - second.z) <=1)
+			if(Math.Abs(first.z - second.z) <=5)
 			{
 				return true;
 			}
