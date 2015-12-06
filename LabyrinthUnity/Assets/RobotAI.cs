@@ -74,6 +74,7 @@ public class RobotAI : MonoBehaviour {
 
 		if (canSeePlayer()) {
 			state = State.CHARGING;
+			agent.SetDestination(GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ().position);
 			Debug.Log("ROBOT GOING TO CHARGE!");
 		}
 		
@@ -88,25 +89,35 @@ public class RobotAI : MonoBehaviour {
 	}
 	
 	void Charging () {
-		Debug.Log("ROBOT CHARGING!");
+		NavMeshAgent agent = GetComponentInParent<NavMeshAgent> ();
+		Vector3 playerPosition = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ().position;
 		if (!movingSound.isPlaying) {
 			movingSound.Play();
 		}
 
-		if (!playerSighted) { 
+		if (canSeePlayer()) { 
+			agent.SetDestination(playerPosition);
 
-		} else {
-			NavMeshAgent agent = GetComponentInParent<NavMeshAgent> ();
-			GameObject player = GameObject.FindGameObjectWithTag("Player");
-			Vector3 playerLocation = player.GetComponent<Transform>().position;
-			
-			if (!agent.destination.Equals (playerLocation)) {
-				agent.angularSpeed = angularSpeed_fast;
-				agent.speed = speed_fast;
-				agent.destination = playerLocation;
-				Debug.Log ("ROBOT Charging");
+		} 
+		else {
+			if(firstTime) {
+				Debug.Log("STILL CHASING BUT CAN'T SEE");
+				waitCount = 50;
+				agent.SetDestination(playerPosition);
+				firstTime = false;
 			}
-			playerSighted = false;
+			else if(waitCount > 0){
+				Debug.Log("STILL CHASING BUT CAN'T SEE");
+				waitCount--;
+				agent.SetDestination(playerPosition);
+			}
+			else
+			{
+				state = State.IDLE;
+				firstTime = true;
+				
+			}
+;
 		}
 	}
 	
@@ -133,7 +144,7 @@ public class RobotAI : MonoBehaviour {
 			
 
 
-		if (playerSighted) {
+		if (canSeePlayer()) {
 			state = State.CHARGING;
 			Debug.Log("ROBOT GOING TO CHARGE!");
 		}
@@ -142,8 +153,17 @@ public class RobotAI : MonoBehaviour {
 	public void Notify(Vector3 location)
 	{
 		//Debug.Log ("ROBOT NOTIFIED!");
-		destination = location;
-		state = State.ALERT;
+		if (state == State.SLEEPING) {
+			destination = location;
+			state = State.ALERT;
+		} else {
+			if(!canSeePlayer())
+			{
+				destination = location;
+				state = State.ALERT;
+			}
+
+		}
 
 
 	}
