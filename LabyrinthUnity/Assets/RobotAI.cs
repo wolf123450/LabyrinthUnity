@@ -15,6 +15,8 @@ public class RobotAI : MonoBehaviour {
 	private bool firstTime;
 	private AudioSource movingSound;
 
+
+
 	
 	void Start () {
 		
@@ -55,6 +57,7 @@ public class RobotAI : MonoBehaviour {
 	void Alert () {
 		NavMeshAgent agent = GetComponentInParent<NavMeshAgent> ();
 		state = State.ALERT;
+
 		if (!movingSound.isPlaying) {
 			movingSound.Play();
 		}
@@ -69,7 +72,7 @@ public class RobotAI : MonoBehaviour {
 			state = State.IDLE;
 		}
 
-		if (playerSighted) {
+		if (canSeePlayer()) {
 			state = State.CHARGING;
 			Debug.Log("ROBOT GOING TO CHARGE!");
 		}
@@ -145,7 +148,25 @@ public class RobotAI : MonoBehaviour {
 
 	}
 
+	bool canSeePlayer  () 
+	{
+		Transform playerTransform = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ();
+		Transform myTransform = GetComponentInParent<Transform> ();
+		RaycastHit hit = new RaycastHit();
+		Vector3 rayDirection = playerTransform.position - myTransform.position;
+		if (Physics.Raycast(myTransform.position, rayDirection, out hit, 100)) {
+			if (hit.transform == playerTransform) {
+				Debug.Log("I SEE THE PLAYER: ROBOT");
+				return true;
+			} else {
+				return false;
+			}
 
+		}
+		return false;
+		
+
+	}
 	
 	bool isClose(Vector3 first, Vector3 second)
 	{
