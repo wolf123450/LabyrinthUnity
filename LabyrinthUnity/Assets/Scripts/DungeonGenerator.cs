@@ -6,12 +6,16 @@ using System.Diagnostics;
 using System.Collections;
 
 
+
 public class DungeonGenerator :MonoBehaviour 
 {
 	public GameObject playerController;
 	public GameObject MinotaurPrefab;
+	public GameObject wallChainPrefab;
+	public GameObject floorChainPrefab;
 	public GameObject GhostPrefab;
 	public GameObject RobotPrefab;
+	public GameObject SecurityCameraPrefab;
 	public GameObject StairsPrefab;
 	public GameObject WallPrefab;
 
@@ -62,40 +66,96 @@ public class DungeonGenerator :MonoBehaviour
 
 				Vector3 start = new Vector3(0,-10,0);
 				Vector3 end = new Vector3(0,-10,1);
-				bool startPlaced = false;
-				bool endPlaced = false;
+				List<Vector3> spaces = new List<Vector3>();
+				List<Vector3> walls = new List<Vector3>();
 				for (int x = 0; x < borderedMap.GetLength(0); x++){
 					for (int y = 0; y < borderedMap.GetLength(1); y++){
-						if ( borderedMap[x,y] == DungeonGen.space && dgen.rand.Next(0,100) > 50 && !startPlaced){
-
-							start = new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-10,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth);
-							UnityEngine.Debug.Log((x-(borderedMap.GetLength(0)/2))*meshGen.squareWidth);
-							startPlaced = true;
-						} else if ( borderedMap[x,y] == DungeonGen.space && dgen.rand.Next(0,100) > 50 && startPlaced && !endPlaced){
-							
-							end = new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-11,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth);
-
-							endPlaced = true;
-//							break;
+						if ( borderedMap[x,y] == DungeonGen.space){
+							spaces.Add(new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-10,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth));
 						} else if (borderedMap[x,y] == DungeonGen.wall){
+							walls.Add(new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-10,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth));
 							Instantiate(WallPrefab, new Vector3((x-borderedMap.GetLength(0)/2)*meshGen.squareWidth-meshGen.squareWidth,-8,(y-borderedMap.GetLength(1)/2)*meshGen.squareWidth-meshGen.squareWidth), transform.rotation);
 						}
 					}
-//					if (endPlaced)
-//						break;
 				}
-				UnityEngine.Debug.Log(start);
+//				UnityEngine.Random.seed = 2;
+				start = spaces[UnityEngine.Random.Range(0,spaces.Count)];
+				end = start;
+				while (Vector3.Distance(start, end) < 6){  //Place end at least 6 away from start;
+					end = spaces[UnityEngine.Random.Range(0,spaces.Count)];
+				}
+
+				for (int i = 0; i < spaces.Count/8; i++){
+					placeObjectOnRandomWall(spaces, walls, wallChainPrefab, Vector3.zero);//For Minotaur
+					Vector3 floorChain = spaces[UnityEngine.Random.Range(0,spaces.Count)];
+					Instantiate(floorChainPrefab, floorChain+Vector3.down, floorChainPrefab.transform.rotation);
+				}
+				Vector3 minotaurStart = start;
+				while (Vector3.Distance(minotaurStart, start) < 12){  //Place minotaur at least 12 away from start;
+					minotaurStart = spaces[UnityEngine.Random.Range(0,spaces.Count)];
+				}
+
+				Instantiate(MinotaurPrefab, minotaurStart, MinotaurPrefab.transform.rotation);
+
+				for (int i = 0; i < spaces.Count/16; i++){
+					placeObjectOnRandomWall(spaces, walls, SecurityCameraPrefab, new Vector3(0,2,0)); //For robot
+				}
+				Vector3 robotStart = start;
+				while (Vector3.Distance(robotStart, start) < 12){  //Place minotaur at least 12 away from start;
+					robotStart = spaces[UnityEngine.Random.Range(0,spaces.Count)];
+				}
+				Instantiate(RobotPrefab, robotStart, RobotPrefab.transform.rotation);
+//				chain.transform.position += (closestWall-wallCh)/2;
+
+
+
 //				meshGen.GenerateMesh(borderedMap);
 
 				Destroy(Camera.main.gameObject);
 
 				Instantiate(playerController, start, transform.rotation);
 
-				Instantiate(StairsPrefab, end, StairsPrefab.transform.rotation);
+				Instantiate(StairsPrefab, end+Vector3.down, StairsPrefab.transform.rotation);
 				dgen = null;
 			}
 		}
 
+	}
+
+	void placeObjectOnRandomWall(List<Vector3> spaces, List<Vector3> walls, GameObject prefab, Vector3 translateOffset){
+		//Add wallchains
+		Vector3 targetSpace = new Vector3(0,0,0);
+		Vector3 closestWall = new Vector3(10,10,10);
+		
+		while(Vector3.Distance(targetSpace, closestWall) > 5){
+			targetSpace = spaces[UnityEngine.Random.Range(0,spaces.Count)];
+			closestWall = closestTo(targetSpace, walls);
+
+		}
+		GameObject placedObject = (GameObject)Instantiate(prefab, targetSpace, prefab.transform.rotation); //remember and face the closest wall?
+		//				chain.transform.rotation.SetLookRotation(closestWall-wallChain);
+		//				chain.transform.rotation.SetFromToRotation(Vector3.forward, Vector3.left);
+		Vector3 diff = (closestWall-targetSpace).normalized;
+		placedObject.transform.Translate(diff*2, Space.World);
+		placedObject.transform.Translate(translateOffset, Space.World);
+		placedObject.transform.Rotate(Vector3.up*(180/Mathf.PI*(-Mathf.Atan2 (diff.z, diff.x))), Space.World);
+		UnityEngine.Debug.Log(diff);
+		UnityEngine.Debug.Log (180/Mathf.PI*(-Mathf.Atan2 (diff.z, diff.x)));
+	}
+
+	Vector3 closestTo(Vector3 target, List<Vector3> toCheck){
+		float minDist = float.PositiveInfinity;
+		Vector3 closest = new Vector3();
+		foreach( Vector3 x in toCheck){
+			float d = Vector3.Distance(target, x);
+			if (d < minDist){
+				minDist = d;
+				closest = x;
+			}
+
+		}
+
+		return closest;
 	}
 
 	void OnDrawGizmos(){
@@ -205,7 +265,7 @@ public class DungeonGenerator :MonoBehaviour
 
 		public DungeonGen ()
 		{
-			rand = new System.Random ();//(42);
+			rand = new System.Random (42);//(42);
 		}
 
 		protected override void ThreadFunction(){
