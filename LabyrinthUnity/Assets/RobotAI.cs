@@ -102,7 +102,7 @@ public class RobotAI : MonoBehaviour {
 		else {
 			if(firstTime) {
 				Debug.Log("STILL CHASING BUT CAN'T SEE");
-				waitCount = 10;
+				waitCount = 30;
 				agent.SetDestination(playerPosition);
 				firstTime = false;
 			}
@@ -170,18 +170,20 @@ public class RobotAI : MonoBehaviour {
 
 	bool canSeePlayer  () 
 	{
-		Transform playerTransform = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ();
-		Transform myTransform = GetComponentInParent<Transform> ();
-		RaycastHit hit = new RaycastHit();
-		Vector3 rayDirection = playerTransform.position - myTransform.position;
-		if (Physics.Raycast(myTransform.position, rayDirection, out hit, 100)) {
-			if (hit.transform == playerTransform) {
-				//Debug.Log("I SEE THE PLAYER: ROBOT");
-				return true;
-			} else {
-				return false;
-			}
+		if (state != State.SLEEPING) {
+			Transform playerTransform = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ();
+			Transform myTransform = GetComponentInParent<Transform> ();
+			RaycastHit hit = new RaycastHit ();
+			Vector3 rayDirection = playerTransform.position - myTransform.position;
+			if (Physics.Raycast (myTransform.position, rayDirection, out hit, 100)) {
+				if (hit.transform == playerTransform) {
+					//Debug.Log("I SEE THE PLAYER: ROBOT");
+					return true;
+				} else {
+					return false;
+				}
 
+			}
 		}
 		return false;
 		
