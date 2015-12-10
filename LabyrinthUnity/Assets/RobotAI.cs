@@ -75,7 +75,6 @@ public class RobotAI : MonoBehaviour {
 		if (canSeePlayer()) {
 			state = State.CHARGING;
 			agent.SetDestination(GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ().position);
-			Debug.Log("ROBOT GOING TO CHARGE!");
 		}
 		
 
@@ -101,13 +100,11 @@ public class RobotAI : MonoBehaviour {
 		} 
 		else {
 			if(firstTime) {
-				Debug.Log("STILL CHASING BUT CAN'T SEE");
 				waitCount = 30;
 				agent.SetDestination(playerPosition);
 				firstTime = false;
 			}
 			else if(waitCount > 0){
-				Debug.Log("STILL CHASING BUT CAN'T SEE");
 				waitCount--;
 				agent.SetDestination(playerPosition);
 			}
@@ -194,7 +191,7 @@ public class RobotAI : MonoBehaviour {
 
 	void OnTriggerEnter(Collider obj) {
 		if (obj.tag.Equals ("Player")) {
-			Application.LoadLevel("DeathScene");
+		 	Application.LoadLevel("DeathScene");
 		}
 	}
 	
