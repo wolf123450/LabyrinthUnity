@@ -8,8 +8,7 @@ public class WanderingGhost : MonoBehaviour {
 	private bool alert;
 	private int wanderCount;
 	private bool turning;
-	private bool inOuterTrigger;
-
+	
 	
 	// Use this for initialization
 	void Start () {
@@ -28,73 +27,67 @@ public class WanderingGhost : MonoBehaviour {
 			Wander ();
 	}
 	
-
+	
 	void OnTriggerEnter(Collider obj) {
 		if (obj.tag.Equals ("Player")) {
-			if (inOuterTrigger) 
-			{
-				Application.LoadLevel("DeathScene");
-			} 
-			else 
-			{
-
-				inOuterTrigger = true;
-				alert = true;
-				turning = false;
-				target = obj.attachedRigidbody;
-				
-				if (!scream.isPlaying) {
-					scream.Play ();
-				}
-				scream.loop = true;
-
+			alert = true;
+			turning = false;
+			target = obj.attachedRigidbody;
+			
+			if (!scream.isPlaying) {
+				scream.Play ();
 			}
+			scream.loop = true;
 		} 
-
+		
 	}
 	
-	void OnTriggerExit(Collider ob) {
-		inOuterTrigger = false;
-		alert = false;
-		target = null;
-		scream.loop = false;
+	void OnTriggerExit(Collider obj) {
+		if (obj.tag.Equals ("Player")) {
+			alert = false;
+			
+			target = null;
+			//scream.loop = false;
+			scream.Stop ();
+		}
 	}
 	
 	private void Alert() {
+		
 		body.angularVelocity = new Vector3 (0, 0, 0);
 		body.velocity = new Vector3 (0, 0, 0);
-
+		
 		//Debug.DrawLine (target.position, body.position, Color.red);
 		//Debug.DrawRay (body.position, body.transform.forward, Color.green);
-
-
+		
+		
 		Vector3 desiredDirection = target.position - body.position;
 		Vector2 desiredDirection2d = new Vector2(desiredDirection.x, desiredDirection.z).normalized;
 		Vector2 bodyDirection2d = new Vector2 (body.transform.forward.x, body.transform.forward.z).normalized;
-
+		
 		float desiredAngle = Mathf.Atan2 (desiredDirection2d.y, desiredDirection2d.x);
 		float bodyAngle = Mathf.Atan2 (bodyDirection2d.y, bodyDirection2d.x);
-
+		
 		float angle = (desiredAngle - bodyAngle) * Mathf.Rad2Deg;
 		if (angle > 180) {
 			angle -= 360;
 		} else if (angle < -180) {
 			angle += 360;
 		}
-
-
+		
+		
 		//Rotate to the direction of the Player
 		if (angle > 2) {
-			float rotation = -2;
+			float rotation = -6;
 			Turn (rotation);
 		} 
 		else if (angle < -2) {
-			float rotation = 2;
+			float rotation = 6;
 			Turn (rotation);
 		}
 		else {
 			//Move in that direction
-			float wanderingSpeed = .7f;
+			float wanderingSpeed = 2.5f;
 			Forward (wanderingSpeed); 
 		}
 	}
@@ -125,14 +118,14 @@ public class WanderingGhost : MonoBehaviour {
 			float rotation = 1;
 			Turn (rotation);
 		} else {
-			float wanderingSpeed = .4f;
+			float wanderingSpeed = .5f;
 			Forward (wanderingSpeed); 
 		}
 		wanderCount--;
 	}
-
-
-
+	
+	
+	
 	private void Turn(float rotation) {
 		body.angularVelocity = new Vector3 (0, rotation, 0);
 	}
