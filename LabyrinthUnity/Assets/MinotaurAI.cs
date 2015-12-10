@@ -13,27 +13,27 @@ public class MinotaurAI : MonoBehaviour {
 	private float speed_fast;
 	private float angularSpeed_slow;
 	private float speed_slow;
-	private bool playerSighted;
 	private bool firstTime;
 	private int waitCount;
 
 
 	void Start () {
+
 		lairLocation = GetComponent<Transform> ().position;
 		hearingScale = 0;//99; //If more difficult can be as low as 50
 		loudNoiseHeard = false;
 		firstTime = true;
 
 		angularSpeed_fast = 120f;
-		speed_fast = 4f;
+		speed_fast = 3f;
 		angularSpeed_slow = 80f;
-		speed_slow = 2f;
+		speed_slow = 1f;
 
 		state = State.SLEEPING;
-		playerSighted = false;
 	}
 
 	void Update () {
+
 		switch (state) {
 			case State.SLEEPING: Sleeping(); break;
 			case State.ALERT: Alert(); break;
@@ -95,8 +95,9 @@ public class MinotaurAI : MonoBehaviour {
 		}
 
 		//Debug.Log (GetComponent<Transform>().position.ToString() + " : " + destination.ToString() );
-		if (playerSighted) { 
+		if (canSeePlayer()) { 
 			state = State.CHARGING; 
+			destination = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ().position;
 		}
 		else if (isClose(GetComponent<Transform>().position, destination)) {  
 			if(firstTime) {
@@ -116,32 +117,51 @@ public class MinotaurAI : MonoBehaviour {
 	}
 	
 	void Wandering () {
+		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
+		agent.SetDestination (destination);
 		//randomly move to a few interesctions near destination
-		
+		if (canSeePlayer ()) {
+			state = State.CHARGING;
+			destination = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ().position;
+		} else {
+			state = State.ALERT;
+		}
 		//if (player found) { state = State.CHARGING; }
 		//else if (wander time equals 0 && player not found) { state = State.RETURNING; }
 	}
 	
 	void Charging () {
-		if (!playerSighted) { 
-			state = State.WANDERING;
-		} else {
-			NavMeshAgent agent = GetComponent<NavMeshAgent> ();
-			GameObject player = GameObject.FindGameObjectWithTag("Player");
-			Vector3 playerLocation = player.GetComponent<Transform>().position;
+		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
+		agent.SetDestination (destination);
+		if (canSeePlayer())
+		{
+			Debug.Log("CHARGING Can SEE!");
 
-			if (!agent.destination.Equals (playerLocation)) {
-				agent.angularSpeed = angularSpeed_fast;
-				agent.speed = speed_fast;
-				agent.destination = playerLocation;
-				Debug.Log ("Charging");
-			}
-			playerSighted = false;
+			
+			destination = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ().position;
+			
+			agent.angularSpeed = angularSpeed_fast;
+			agent.speed = speed_fast;
+			
 		}
+		
+		else 
+		
+		{ 
+
+				state = State.WANDERING;
+
+
+		} 
+	
+
+
+
 	}
 	
 	void Returning () {
 		NavMeshAgent agent = GetComponent<NavMeshAgent> ();
+		agent.SetDestination (destination);
 
 		if (firstTime) {
 			agent.angularSpeed = angularSpeed_slow;
@@ -154,8 +174,9 @@ public class MinotaurAI : MonoBehaviour {
 		}
 
 
-		if (playerSighted) { 
+		if (canSeePlayer()) { 
 			state = State.CHARGING; 
+			destination = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ().position;
 		} else if (isClose(GetComponent<Transform> ().position,lairLocation)) {
 			Debug.Log("Go to sleep....");
 			state = State.SLEEPING;
@@ -163,8 +184,31 @@ public class MinotaurAI : MonoBehaviour {
 		}
 	}
 
+	bool canSeePlayer  () 
+	{
+		Transform playerTransform = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ();
+		Transform myTransform = GetComponent<Transform> ();
+		RaycastHit hit = new RaycastHit();
+		Vector3 rayDirection = playerTransform.position - myTransform.position;
 
+		if (Physics.Raycast(myTransform.position, rayDirection, out hit, 100)) {
+			if (hit.transform == playerTransform) {
+				return true;
+			} else {
+				return false;
+			}
+			
+		}
+		return false;
+		
+		
+	}
 
+	void OnTriggerEnter(Collider obj) {
+		if (obj.tag.Equals ("Player")) {
+			Application.LoadLevel("DeathScene");
+		}
+	}
 
     bool isClose(Vector3 first, Vector3 second)
 	{
