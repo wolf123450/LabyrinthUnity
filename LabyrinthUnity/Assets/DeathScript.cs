@@ -10,7 +10,7 @@ public class DeathScript : MonoBehaviour {
 	void Start () {
 
 		firstTime = true;
-		waitCount = 900;
+		waitCount = 300;
  		Laughter = GetComponent<AudioSource> ();
 
 
