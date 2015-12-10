@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\CameraAI.cs" />
+     <Compile Include="Assets\DeathScript.cs" />
      <Compile Include="Assets\MinotaurAI.cs" />
      <Compile Include="Assets\ObjectSound.cs" />
      <Compile Include="Assets\RobotAI.cs" />
