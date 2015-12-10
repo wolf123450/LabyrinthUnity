@@ -8,9 +8,11 @@ public class NextLevel : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other){
 		//DungeonGenerator dGen = DungeonGenerator.GetComponent<DungeonGenerator>();
-		DungeonGenerator.DungeonGen.width += 5;
-		DungeonGenerator.DungeonGen.height += 5;
+		if (other.tag.Equals ("Player")) {
+			DungeonGenerator.DungeonGen.width += 5;
+			DungeonGenerator.DungeonGen.height += 5;
 
-		Application.LoadLevel (nextLevel);
+			Application.LoadLevel (nextLevel);
+		}
 	}
 }
