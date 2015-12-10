@@ -8,6 +8,8 @@ public class WanderingGhost : MonoBehaviour {
 	private bool alert;
 	private int wanderCount;
 	private bool turning;
+	private bool inOuterTrigger;
+
 	
 	// Use this for initialization
 	void Start () {
@@ -26,20 +28,33 @@ public class WanderingGhost : MonoBehaviour {
 			Wander ();
 	}
 	
+
 	void OnTriggerEnter(Collider obj) {
 		if (obj.tag.Equals ("Player")) {
-			alert = true;
-			turning = false;
-			target = obj.attachedRigidbody;
+			if (inOuterTrigger) 
+			{
+				Application.LoadLevel("DeathScene");
+			} 
+			else 
+			{
 
-			if(!scream.isPlaying) {
-				scream.Play ();
+				inOuterTrigger = true;
+				alert = true;
+				turning = false;
+				target = obj.attachedRigidbody;
+				
+				if (!scream.isPlaying) {
+					scream.Play ();
+				}
+				scream.loop = true;
+
 			}
-			scream.loop = true;
-		}
+		} 
+
 	}
 	
 	void OnTriggerExit(Collider ob) {
+		inOuterTrigger = false;
 		alert = false;
 		target = null;
 		scream.loop = false;
@@ -79,7 +94,7 @@ public class WanderingGhost : MonoBehaviour {
 		}
 		else {
 			//Move in that direction
-			float wanderingSpeed = .5f;
+			float wanderingSpeed = .7f;
 			Forward (wanderingSpeed); 
 		}
 	}
@@ -110,12 +125,14 @@ public class WanderingGhost : MonoBehaviour {
 			float rotation = 1;
 			Turn (rotation);
 		} else {
-			float wanderingSpeed = .3f;
+			float wanderingSpeed = .4f;
 			Forward (wanderingSpeed); 
 		}
 		wanderCount--;
 	}
-	
+
+
+
 	private void Turn(float rotation) {
 		body.angularVelocity = new Vector3 (0, rotation, 0);
 	}

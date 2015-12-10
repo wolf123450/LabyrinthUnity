@@ -20,7 +20,6 @@ public class CameraAI : MonoBehaviour {
 			Vector3 location = GetComponentInParent<Transform>().position;
 			GameObject[] robots = GameObject.FindGameObjectsWithTag("Robot");
 			double shortestDistance = double.PositiveInfinity;
-			Debug.Log("NUM OF ROBOTS: "+robots.Length.ToString());
 			int nearestRobotIndex = 0;
 			for(int i = 0; i < robots.Length; i++)
 			{
@@ -31,9 +30,7 @@ public class CameraAI : MonoBehaviour {
 					nearestRobotIndex = i;
 				}
 			}
-			Debug.Log("NEAREST: " + nearestRobotIndex.ToString());
 			robots[nearestRobotIndex].GetComponentInChildren<RobotAI>().Notify(location);
-			Debug.Log("CAMERA SENT NOTIFICATION");
 		}
 	}
 	
