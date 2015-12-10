@@ -102,7 +102,7 @@ public class RobotAI : MonoBehaviour {
 		else {
 			if(firstTime) {
 				Debug.Log("STILL CHASING BUT CAN'T SEE");
-				waitCount = 50;
+				waitCount = 10;
 				agent.SetDestination(playerPosition);
 				firstTime = false;
 			}
@@ -146,7 +146,7 @@ public class RobotAI : MonoBehaviour {
 
 		if (canSeePlayer()) {
 			state = State.CHARGING;
-			Debug.Log("ROBOT GOING TO CHARGE!");
+			//Debug.Log("ROBOT GOING TO CHARGE!");
 		}
 	}
 	
@@ -176,7 +176,7 @@ public class RobotAI : MonoBehaviour {
 		Vector3 rayDirection = playerTransform.position - myTransform.position;
 		if (Physics.Raycast(myTransform.position, rayDirection, out hit, 100)) {
 			if (hit.transform == playerTransform) {
-				Debug.Log("I SEE THE PLAYER: ROBOT");
+				//Debug.Log("I SEE THE PLAYER: ROBOT");
 				return true;
 			} else {
 				return false;
@@ -186,6 +186,14 @@ public class RobotAI : MonoBehaviour {
 		return false;
 		
 
+	}
+
+
+
+	void OnTriggerEnter(Collider obj) {
+		if (obj.tag.Equals ("Player")) {
+			Application.LoadLevel("DeathScene");
+		}
 	}
 	
 	bool isClose(Vector3 first, Vector3 second)

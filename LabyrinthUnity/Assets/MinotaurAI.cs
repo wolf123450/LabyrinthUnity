@@ -75,7 +75,7 @@ public class MinotaurAI : MonoBehaviour {
 		if (!snore.isPlaying) {
 			snore.time = 0;
 			snore.Play();
-			Debug.Log ("Sleeping");
+			//Debug.Log ("Sleeping");
 		}
 		if (loudNoiseHeard) {
 			state = State.ALERT;
@@ -91,7 +91,7 @@ public class MinotaurAI : MonoBehaviour {
 			agent.angularSpeed = angularSpeed_slow;
 			agent.speed = speed_slow;
 			agent.destination = destination;
-			Debug.Log ("Alert");
+			//Debug.Log ("Alert");
 		}
 
 		//Debug.Log (GetComponent<Transform>().position.ToString() + " : " + destination.ToString() );
