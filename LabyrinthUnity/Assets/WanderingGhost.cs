@@ -47,8 +47,8 @@ public class WanderingGhost : MonoBehaviour {
 			alert = false;
 			
 			target = null;
-			//scream.loop = false;
-			scream.Stop ();
+			scream.loop = false;
+			//scream.Stop ();
 		}
 	}
 	
