@@ -8,10 +8,11 @@ public class DeathScript : MonoBehaviour {
 	AudioSource Laughter;
 	// Use this for initialization
 	void Start () {
-
+		Cursor.visible = true;
 		firstTime = true;
 		waitCount = 300;
  		Laughter = GetComponent<AudioSource> ();
+		Cursor.lockState = CursorLockMode.None;
 
 
 
