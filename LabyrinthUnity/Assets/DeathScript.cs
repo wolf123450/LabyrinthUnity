@@ -35,6 +35,8 @@ public class DeathScript : MonoBehaviour {
 		else
 		{
 			firstTime = true;
+			DungeonGenerator.DungeonGen.width = 5;
+			DungeonGenerator.DungeonGen.height = 10;
 			Application.LoadLevel("Game");
 		}
 

@@ -106,7 +106,11 @@ public class DungeonGenerator :MonoBehaviour
 				}
 				Instantiate(RobotPrefab, robotStart, RobotPrefab.transform.rotation);
 //				chain.transform.position += (closestWall-wallCh)/2;
-
+				Vector3 ghostStart = start;
+				while (Vector3.Distance(ghostStart, start) < 12){  //Place minotaur at least 12 away from start;
+					ghostStart = walls[UnityEngine.Random.Range(0,spaces.Count)];
+				}
+				Instantiate(GhostPrefab, ghostStart, GhostPrefab.transform.rotation);
 
 
 //				meshGen.GenerateMesh(borderedMap);
@@ -139,8 +143,8 @@ public class DungeonGenerator :MonoBehaviour
 		placedObject.transform.Translate(diff*2, Space.World);
 		placedObject.transform.Translate(translateOffset, Space.World);
 		placedObject.transform.Rotate(Vector3.up*(180/Mathf.PI*(-Mathf.Atan2 (diff.z, diff.x))), Space.World);
-		UnityEngine.Debug.Log(diff);
-		UnityEngine.Debug.Log (180/Mathf.PI*(-Mathf.Atan2 (diff.z, diff.x)));
+//		UnityEngine.Debug.Log(diff);
+//		UnityEngine.Debug.Log (180/Mathf.PI*(-Mathf.Atan2 (diff.z, diff.x)));
 	}
 
 	Vector3 closestTo(Vector3 target, List<Vector3> toCheck){
