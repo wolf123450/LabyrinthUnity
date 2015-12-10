@@ -135,7 +135,6 @@ public class MinotaurAI : MonoBehaviour {
 		agent.SetDestination (destination);
 		if (canSeePlayer())
 		{
-			Debug.Log("CHARGING Can SEE!");
 
 			
 			destination = GameObject.FindGameObjectWithTag ("Player").GetComponent<Transform> ().position;
@@ -205,7 +204,9 @@ public class MinotaurAI : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider obj) {
+		Debug.Log ("HIT!");
 		if (obj.tag.Equals ("Player")) {
+			Debug.Log("HIT PLAYER!");
 			Application.LoadLevel("DeathScene");
 		}
 	}

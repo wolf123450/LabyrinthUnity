@@ -79,7 +79,7 @@ public class WanderingGhost : MonoBehaviour {
 		}
 		else {
 			//Move in that direction
-			float wanderingSpeed = .7f;
+			float wanderingSpeed = .5f;
 			Forward (wanderingSpeed); 
 		}
 	}
@@ -110,7 +110,7 @@ public class WanderingGhost : MonoBehaviour {
 			float rotation = 1;
 			Turn (rotation);
 		} else {
-			float wanderingSpeed = .4f;
+			float wanderingSpeed = .3f;
 			Forward (wanderingSpeed); 
 		}
 		wanderCount--;
