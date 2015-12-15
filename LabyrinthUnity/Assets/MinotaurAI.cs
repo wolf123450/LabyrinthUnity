@@ -20,7 +20,7 @@ public class MinotaurAI : MonoBehaviour {
 	void Start () {
 
 		lairLocation = GetComponent<Transform> ().position;
-		hearingScale = 0;//99; //If more difficult can be as low as 50
+		hearingScale = 99; //If more difficult can be as low as 50
 		loudNoiseHeard = false;
 		firstTime = true;
 
