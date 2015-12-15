@@ -107,8 +107,8 @@ public class DungeonGenerator :MonoBehaviour
 				Instantiate(RobotPrefab, robotStart, RobotPrefab.transform.rotation);
 //				chain.transform.position += (closestWall-wallCh)/2;
 				Vector3 ghostStart = start;
-				while (Vector3.Distance(ghostStart, start) < 12){  //Place minotaur at least 12 away from start;
-					ghostStart = walls[UnityEngine.Random.Range(0,spaces.Count)];
+				while (Vector3.Distance(ghostStart, start) < 4 || Vector3.Distance(ghostStart, start) >12){  //Place minotaur at least 12 away from start;
+					ghostStart = spaces[UnityEngine.Random.Range(0,spaces.Count)];
 				}
 				Instantiate(GhostPrefab, ghostStart, GhostPrefab.transform.rotation);
 
